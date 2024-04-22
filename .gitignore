@@ -5,7 +5,7 @@ __pycache__/
 
 # C extensions
 *.so
-
+*.glsl
 # Distribution / packaging
 .Python
 build/
