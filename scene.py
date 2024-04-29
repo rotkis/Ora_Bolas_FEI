@@ -14,12 +14,12 @@ class Scene:
         app = self.app
         add = self.add_object
 
-        n, s = 30, 3
+        n, s = 80, 2
         for x in range(-n, n, s):
             for z in range(-n, n, s):
                 add(Cube(app, pos=(x, -s, z)))
 
-        add(Cat(app, pos=(0, -2, -10)))
+        add(Cat(app, pos=(0, -1, -10)))
 
     def render(self):
         for obj in self.objects:
