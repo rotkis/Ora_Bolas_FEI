@@ -21,6 +21,8 @@ class Scene:
 
         add(Cat(app, pos=(0, -1, -10)))
 
+        add(Ball(app, pos=(20, 5, 0)))
+
     def render(self):
         for obj in self.objects:
             obj.render()

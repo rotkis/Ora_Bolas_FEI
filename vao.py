@@ -18,6 +18,11 @@ class VAO:
         self.vaos['cat'] = self.get_vao(
             program=self.program.programs['default'],
             vbo=self.vbo.vbos['cat'])
+        
+        # ball vao
+        self.vaos['ball'] = self.get_vao(
+            program=self.program.programs['default'],
+            vbo=self.vbo.vbos['ball'])
 
     def get_vao(self, program, vbo):
         vao = self.ctx.vertex_array(program, [(vbo.vbo, vbo.format, *vbo.attribs)])

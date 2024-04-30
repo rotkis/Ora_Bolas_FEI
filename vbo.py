@@ -8,6 +8,7 @@ class VBO:
         self.vbos = {}
         self.vbos['cube'] = CubeVBO(ctx)
         self.vbos['cat'] = CatVBO(ctx)
+        self.vbos['ball'] = BallVBO(ctx)
 
     def destroy(self):
         [vbo.destroy() for vbo in self.vbos.values()]
@@ -89,6 +90,18 @@ class CatVBO(BaseVBO):
         vertex_data = np.array(vertex_data, dtype='f4')
         return vertex_data
 
+class BallVBO(BaseVBO):
+    def __init__(self, app):
+        super().__init__(app)
+        self.format = '2f 3f 3f'
+        self.attribs = ['in_texcoord_0', 'in_normal', 'in_position']
+
+    def get_vertex_data(self):
+        objs = pywavefront.Wavefront('objects/ball/source/Ball/ball.obj', cache=True, parse=True)
+        obj = objs.materials.popitem()[1]
+        vertex_data = obj.vertices
+        vertex_data = np.array(vertex_data, dtype='f4')
+        return vertex_data
 
 
 
