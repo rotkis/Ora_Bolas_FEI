@@ -10,14 +10,28 @@ class Scene:
         self.add_object(self.gato)  # Adicione o gato à lista de objetos
         self.ponto_origem_gato = glm.vec3(10, -1, 20)
         self.ponto_destino_gato = glm.vec3(20, -1, 30)
-        self.velocidade = 0.005  # Ajuste a velocidade conforme necessário
+        self.velocidade_gato = 0.015  # Ajuste a velocidade conforme necessário
+        self.bola = Ball(app, pos=(10, -1, 20))  # Adicione o gato aqui
+        self.add_object(self.bola)  # Adicione a bola à lista de objetos
+        self.ponto_origem_bola = glm.vec3(0, -0.27, 0)
+        self.ponto_destino_bola = glm.vec3(45, -0.27, 45)
+        self.velocidade_bola = 0.013  # Ajuste a velocidade conforme necessário
+
+    def animar_bola(self):
+        # Atualiza a posição da bola
+        direcao = glm.normalize(self.ponto_destino_bola - self.ponto_origem_bola)
+        distancia = glm.distance(self.ponto_origem_bola, self.ponto_destino_bola)
+        if distancia > 0.1:  # 'epsilon' para evitar oscilação
+            self.ponto_origem_bola += direcao * self.velocidade_bola
+            self.bola.pos = (self.ponto_origem_bola.x, self.ponto_origem_bola.y, self.ponto_origem_bola.z)
+            self.bola.m_model = self.bola.get_model_matrix()
 
     def animar_gato(self):
         # Atualiza a posição do gato
         direcao = glm.normalize(self.ponto_destino_gato - self.ponto_origem_gato)
         distancia = glm.distance(self.ponto_origem_gato, self.ponto_destino_gato)
         if distancia > 0.1:  # 'epsilon' para evitar oscilação
-            self.ponto_origem_gato += direcao * self.velocidade
+            self.ponto_origem_gato += direcao * self.velocidade_gato
             self.gato.pos = (self.ponto_origem_gato.x, self.ponto_origem_gato.y, self.ponto_origem_gato.z)
             self.gato.m_model = self.gato.get_model_matrix()
         
@@ -25,21 +39,11 @@ class Scene:
     def add_object(self, obj):
         self.objects.append(obj)
 
-    def mover_objeto(self, obj, destino, velocidade):
-    # Calcula a direção e a distância até o destino
-        direcao = glm.normalize(destino - glm.vec3(obj.pos))
-        distancia = glm.distance(glm.vec3(obj.pos), destino)
 
-    # Se a distância for maior que um 'epsilon', move o objeto
-        if distancia > 0.1:  # 'epsilon' para evitar oscilação quando chegar perto do destino
-            nova_posicao = glm.vec3(obj.pos) + direcao * velocidade
-            obj.pos = (nova_posicao.x, nova_posicao.y, nova_posicao.z)
-            obj.m_model = obj.get_model_matrix()  # Atualiza a matriz do modelo
-        return obj
     def load(self):
         app = self.app
         add = self.add_object
-        mover = self.mover_objeto
+        
         
         
         for i in range(49):
@@ -99,16 +103,9 @@ class Scene:
                     add(Cobe(app, pos=(i, -2, -8+j)))
                     add(Cobe(app, pos=(i, -2, 78-j)))
 
-
-        
-#        cat = Cat(self.app, pos=(10, -1, 20), rot=(-90, 0, 0))
-#        add(cat)
-#        destino = glm.vec3(20, -1, 20)
-#        cat = mover(cat, destino, 0.1)
-#        self.objects[-1] = cat  # Atualiza a posição do 'Cat' na lista
-        for i in range(100):
-            if(i % 10 == 0):
-                add(Ball(app, pos=(i, 0, i-8)))
+        # for i in range(100):
+        #     if(i % 10 == 0):
+        #         add(Ball(app, pos=(i, 0, i-8)))
 
     def render(self):
         for obj in self.objects:

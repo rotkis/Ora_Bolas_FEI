@@ -62,6 +62,7 @@ class GraphicsEngine:
         while True:
             self.get_time()
             self.scene.animar_gato()
+            self.scene.animar_bola()
             self.check_events()
             self.camera.update()
             self.render()
