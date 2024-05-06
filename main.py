@@ -61,6 +61,7 @@ class GraphicsEngine:
     def run(self):
         while True:
             self.get_time()
+            self.scene.animar_gato()
             self.check_events()
             self.camera.update()
             self.render()

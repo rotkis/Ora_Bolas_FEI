@@ -1,20 +1,46 @@
 from model import *
-
+import glm
 
 class Scene:
     def __init__(self, app):
         self.app = app
         self.objects = []
         self.load()
+        self.gato = Cat(app, pos=(10, -1, 20), rot=(-90, 0, 0))  # Adicione o gato aqui
+        self.add_object(self.gato)  # Adicione o gato à lista de objetos
+        self.ponto_origem = glm.vec3(10, -1, 20)
+        self.ponto_destino = glm.vec3(20, -1, 20)
+        self.velocidade = 0.005  # Ajuste a velocidade conforme necessário
+
+    def animar_gato(self):
+        # Atualiza a posição do gato
+        direcao = glm.normalize(self.ponto_destino - self.ponto_origem)
+        distancia = glm.distance(self.ponto_origem, self.ponto_destino)
+        if distancia > 0.1:  # 'epsilon' para evitar oscilação
+            self.ponto_origem += direcao * self.velocidade
+            self.gato.pos = (self.ponto_origem.x, self.ponto_origem.y, self.ponto_origem.z)
+            self.gato.m_model = self.gato.get_model_matrix()
+        
 
     def add_object(self, obj):
         self.objects.append(obj)
 
-  
+    def mover_objeto(self, obj, destino, velocidade):
+    # Calcula a direção e a distância até o destino
+        direcao = glm.normalize(destino - glm.vec3(obj.pos))
+        distancia = glm.distance(glm.vec3(obj.pos), destino)
 
+    # Se a distância for maior que um 'epsilon', move o objeto
+        if distancia > 0.1:  # 'epsilon' para evitar oscilação quando chegar perto do destino
+            nova_posicao = glm.vec3(obj.pos) + direcao * velocidade
+            obj.pos = (nova_posicao.x, nova_posicao.y, nova_posicao.z)
+            obj.m_model = obj.get_model_matrix()  # Atualiza a matriz do modelo
+        return obj
     def load(self):
         app = self.app
         add = self.add_object
+        mover = self.mover_objeto
+        
         
         for i in range(49):
             if(i % 2 == 0):
@@ -75,8 +101,11 @@ class Scene:
 
 
         
-
-        add(Cat(app, pos=(10, -1, 20), rot=(-90, 0,0)))
+#        cat = Cat(self.app, pos=(10, -1, 20), rot=(-90, 0, 0))
+#        add(cat)
+#        destino = glm.vec3(20, -1, 20)
+#        cat = mover(cat, destino, 0.1)
+#        self.objects[-1] = cat  # Atualiza a posição do 'Cat' na lista
         for i in range(100):
             if(i % 10 == 0):
                 add(Ball(app, pos=(i, 0, i-8)))
