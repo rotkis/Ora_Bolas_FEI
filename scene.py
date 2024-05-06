@@ -9,7 +9,7 @@ class Scene:
         self.gato = Cat(app, pos=(10, -1, 20), rot=(-90, 0, 0))  # Adicione o gato aqui
         self.add_object(self.gato)  # Adicione o gato à lista de objetos
         self.ponto_origem_gato = glm.vec3(10, -1, 20)
-        self.ponto_destino_gato = glm.vec3(20, -1, 20)
+        self.ponto_destino_gato = glm.vec3(20, -1, 30)
         self.velocidade = 0.005  # Ajuste a velocidade conforme necessário
 
     def animar_gato(self):
@@ -17,8 +17,8 @@ class Scene:
         direcao = glm.normalize(self.ponto_destino_gato - self.ponto_origem_gato)
         distancia = glm.distance(self.ponto_origem_gato, self.ponto_destino_gato)
         if distancia > 0.1:  # 'epsilon' para evitar oscilação
-            self.ponto_origem += direcao * self.velocidade
-            self.gato.pos = (self.ponto_origem.x, self.ponto_origem.y, self.ponto_origem.z)
+            self.ponto_origem_gato += direcao * self.velocidade
+            self.gato.pos = (self.ponto_origem_gato.x, self.ponto_origem_gato.y, self.ponto_origem_gato.z)
             self.gato.m_model = self.gato.get_model_matrix()
         
 
