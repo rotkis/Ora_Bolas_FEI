@@ -13,9 +13,9 @@ class Scene:
         self.velocidade_gato = 0.015  # Ajuste a velocidade conforme necessário
         self.bola = Ball(app, pos=(10, -1, 20))  # Adicione o gato aqui
         self.add_object(self.bola)  # Adicione a bola à lista de objetos
-        self.ponto_origem_bola = glm.vec3(0, -0.27, 0)
-        self.ponto_destino_bola = glm.vec3(45, -0.27, 45)
-        self.velocidade_bola = 0.013  # Ajuste a velocidade conforme necessário
+        self.ponto_origem_bola = glm.vec3(1, -0.27, 0.5)
+        self.ponto_destino_bola = glm.vec3(51   , -0.27, 10.5)
+        self.velocidade_bola = 0.1  # Ajuste a velocidade conforme necessário
 
     def animar_bola(self):
         # Atualiza a posição da bola
@@ -48,60 +48,60 @@ class Scene:
         
         for i in range(49):
             if(i % 2 == 0):
-                add(Cube(app, pos=(i, -2, -10)))
-                add(Cube(app, pos=(i, -2, 80)))
+                add(Cube(app, pos=(i-2, -2, -10)))
+                add(Cube(app, pos=(i-2, -2, 80)))
             if (i % 16 == 0):
-                add(Cube(app, pos=(i, -2, -8)))
-                add(Cube(app, pos=(i, -2, 78)))
+                add(Cube(app, pos=(i-2, -2, -8)))
+                add(Cube(app, pos=(i-2, -2, 78)))
 
         for i in range(46):
             if(i % 2 == 0):
-                add(Cube(app, pos=(0, -2, i-6)))
-                add(Cube(app, pos=(0, -2, 76-i)))
-                add(Cube(app, pos=(48, -2, i-6)))
-                add(Cube(app, pos=(48, -2, 76-i)))
+                add(Cube(app, pos=(-2, -2, i-6)))
+                add(Cube(app, pos=(-2, -2, 76-i)))
+                add(Cube(app, pos=(46, -2, i-6)))
+                add(Cube(app, pos=(46, -2, 76-i)))
 
         for i in range(15):
             if (i% 2 == 0):
-                add(Cube(app, pos=(16, -2, i-6)))
-                add(Cube(app, pos=(32, -2, i-6)))
-                add(Cube(app, pos=(16, -2, 76-i)))
-                add(Cube(app, pos=(32, -2, 76-i)))
+                add(Cube(app, pos=(14, -2, i-6)))
+                add(Cube(app, pos=(30, -2, i-6)))
+                add(Cube(app, pos=(14, -2, 76-i)))
+                add(Cube(app, pos=(30, -2, 76-i)))
         
         for i in range(15):
             if (i% 2 == 0):
-                add(Cube(app, pos=(16+i, -2, 8)))
-                add(Cube(app, pos=(16+i, -2, 62)))
+                add(Cube(app, pos=(14+i, -2, 8)))
+                add(Cube(app, pos=(14+i, -2, 62)))
 
-        add(Cube(app, pos=(24, -2, 4)))
-        add(Cube(app, pos=(24, -2, 66)))
+        add(Cube(app, pos=(22, -2, 4)))
+        add(Cube(app, pos=(22, -2, 66)))
 
 
         for i in range(49):
             if(i % 2 == 0):
                 if ( i != 0 or i != 48):
-                    add(Cube(app, pos=(i, -2, 34)))
+                    add(Cube(app, pos=(i-2, -2, 34)))
             if (i % 16 == 0):
                 if ( i != 0 or i != 48):
-                    add(Cube(app, pos=(i, -2, 36)))
-                    add(Cube(app, pos=(i, -2, 32)))
+                    add(Cube(app, pos=(i-2, -2, 36)))
+                    add(Cube(app, pos=(i-2, -2, 32)))
 
         for i in range(9):
             if(i % 2 == 0):
-                add(Cube(app, pos=(16, -2, 38+i)))
-                add(Cube(app, pos=(16, -2, 30-i)))
-                add(Cube(app, pos=(32, -2, 38+i)))
-                add(Cube(app, pos=(32, -2, 30-i)))
+                add(Cube(app, pos=(14, -2, 38+i)))
+                add(Cube(app, pos=(14, -2, 30-i)))
+                add(Cube(app, pos=(30, -2, 38+i)))
+                add(Cube(app, pos=(30, -2, 30-i)))
         for i in range(15):
             if(i % 2 == 0):
-                add(Cube(app, pos=(16+i, -2, 22)))
-                add(Cube(app, pos=(16+i, -2, 46)))
+                add(Cube(app, pos=(14+i, -2, 22)))
+                add(Cube(app, pos=(14+i, -2, 46)))
 
         for i in range(49):
             for j in range(46):
                 if(i % 2 == 0 and j % 2 ==0):
-                    add(Cobe(app, pos=(i, -2, -8+j)))
-                    add(Cobe(app, pos=(i, -2, 78-j)))
+                    add(Cobe(app, pos=(i-2, -2, -8+j)))
+                    add(Cobe(app, pos=(i-2, -2, 78-j)))
 
         # for i in range(100):
         #     if(i % 10 == 0):
