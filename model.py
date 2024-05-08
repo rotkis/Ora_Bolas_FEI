@@ -35,7 +35,7 @@ class BaseModel:
 
 
 class Cube(BaseModel):
-    def __init__(self, app, vao_name='cube', tex_id=0, pos=(0, 0, 0), rot=(0, 0, 0), scale=(1, 1, 1)):
+    def __init__(self, app, vao_name='cube', tex_id=0, pos=(0, 0, 0), rot=(0, 0, 0), scale=(0.5, 0.5, 0.5)):
         super().__init__(app, vao_name, tex_id, pos, rot, scale)
         self.on_init()
 
@@ -116,7 +116,7 @@ class Ball(BaseModel):
         self.program['light.Is'].write(self.app.light.Is)
 
 class Cobe(BaseModel):
-    def __init__(self, app, vao_name='cobe', tex_id=1, pos=(0, 0, 0), rot=(0, 0, 0), scale=(1, 1, 1)):
+    def __init__(self, app, vao_name='cobe', tex_id=1, pos=(0, 0, 0), rot=(0, 0, 0), scale=(0.5, 0.5, 0.5)):
         super().__init__(app, vao_name, tex_id, pos, rot, scale)
         self.on_init()
 
