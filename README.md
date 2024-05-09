@@ -7,4 +7,4 @@ Arthur Rotkis 22.123.116-0
 
 
 
-pip install pywavefront PyGLM numpy pygame moderngl
+pip install pywavefront PyGLM numpy pygame moderngl scipy
