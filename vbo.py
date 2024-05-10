@@ -148,18 +148,3 @@ class CobeVBO(BaseVBO):
         vertex_data = np.hstack([tex_coord_data, vertex_data])
         return vertex_data
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

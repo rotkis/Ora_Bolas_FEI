@@ -49,6 +49,9 @@ class GraphicsEngine:
             elif event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 # Pausa ou retoma os movimentos aqui
                 self.scene.toggle_animation()  # Implemente essa função na sua classe Scene
+            elif event.type == pg.KEYDOWN and event.key == pg.K_r:
+                # Reinicia o programa aqui (por exemplo, recrie a cena, redefina variáveis, etc.)
+                self.scene = Scene(self)
 
     def render(self):
         # clear framebuffer
@@ -64,8 +67,7 @@ class GraphicsEngine:
     def run(self):
         while True:
             self.get_time()
-            self.scene.animar_gato()
-            self.scene.animar_bola()
+            self.scene.animar()
             self.check_events()
             self.camera.update()
             self.render()
@@ -75,33 +77,3 @@ class GraphicsEngine:
 if __name__ == '__main__':
     app = GraphicsEngine()
     app.run()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

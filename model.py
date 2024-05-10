@@ -63,7 +63,7 @@ class Cube(BaseModel):
 
 class Cat(BaseModel):
     def __init__(self, app, vao_name='cat', tex_id='cat',
-                 pos=(0, 0, 0), rot=(-90, 180, 0), scale=(0.15, 0.15, 0.15)):
+                 pos=(0, 0, 0), rot=(-90, 180, 0), scale=(0.25, 0.25, 0.25)):
         super().__init__(app, vao_name, tex_id, pos, rot, scale)
         self.on_init()
 
@@ -140,21 +140,4 @@ class Cobe(BaseModel):
         self.program['light.Ia'].write(self.app.light.Ia)
         self.program['light.Id'].write(self.app.light.Id)
         self.program['light.Is'].write(self.app.light.Is)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
