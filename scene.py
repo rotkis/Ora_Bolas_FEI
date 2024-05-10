@@ -17,9 +17,9 @@ class Scene:
         self.bola = Ball(self.app, pos=(1, -0.8, 0.5))  # Adicione o  aqui
         self.add_object(self.bola)  # Adicione a bola à lista de objetos
         self.velocidade_bola = 0.05  # Ajuste a velocidade conforme necessário
-        self.pontos_bola_x = np.array([1, 10, 20, 30, 40, 51])
-        self.pontos_bola_y = np.array([-0.8, -0.8, -0.8, -0.8, -0.8, -0.8])
-        self.pontos_bola_z = np.array([2.5, 10, 20, 30, 40, 52.5])
+        self.pontos_bola_x = np.array([1, 7.525,10.2, 13.175,16.6, 20.625,25.4,31.075 ])
+        self.pontos_bola_y = np.array([-0.8, -0.8, -0.8, -0.8, -0.8, -0.8, -0.8, -0.8])
+        self.pontos_bola_z = np.array([0.5,6.9 ,11.1, 15.1,18.9, 22.5,25.9,29.1 ])
         self.t = np.linspace(self.pontos_bola_x[0], self.pontos_bola_x[-1], num=500)
         self.interp_bola_x = interp1d(self.pontos_bola_x, self.pontos_bola_x, kind='cubic')
         self.interp_bola_y = interp1d(self.pontos_bola_x, self.pontos_bola_y, kind='cubic')
