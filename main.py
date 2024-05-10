@@ -46,6 +46,9 @@ class GraphicsEngine:
                 self.mesh.destroy()
                 pg.quit()
                 sys.exit()
+            elif event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                # Pausa ou retoma os movimentos aqui
+                self.scene.toggle_animation()  # Implemente essa função na sua classe Scene
 
     def render(self):
         # clear framebuffer

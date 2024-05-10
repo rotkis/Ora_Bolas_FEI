@@ -63,7 +63,7 @@ class Cube(BaseModel):
 
 class Cat(BaseModel):
     def __init__(self, app, vao_name='cat', tex_id='cat',
-                 pos=(0, 0, 0), rot=(-90, 180, 0), scale=(0.5, 0.5, 0.5)):
+                 pos=(0, 0, 0), rot=(-90, 180, 0), scale=(0.15, 0.15, 0.15)):
         super().__init__(app, vao_name, tex_id, pos, rot, scale)
         self.on_init()
 
@@ -90,7 +90,7 @@ class Cat(BaseModel):
 
 class Ball(BaseModel):
     def __init__(self, app, vao_name='ball', tex_id='ball',
-                 pos=(0, 0, 0), rot=(0, 0, 0), scale=(0.1, 0.1, 0.1)):
+                 pos=(0, 0, 0), rot=(0, 0, 0), scale=(0.05, 0.05, 0.05)):
         super().__init__(app, vao_name, tex_id, pos, rot, scale)
         self.on_init()
 

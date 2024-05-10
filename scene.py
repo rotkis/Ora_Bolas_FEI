@@ -2,6 +2,7 @@ from model import *
 import glm
 import numpy as np
 from scipy.interpolate import interp1d
+import pygame as pg
 
 
 class Scene:
@@ -11,14 +12,17 @@ class Scene:
         self.load()
         self.load_interpolacao_bola()
         self.load_interpolacao_gato()
+        self.animation_paused = True
         
-        
+    def toggle_animation(self):
+        self.animation_paused = not self.animation_paused
+
     def load_interpolacao_bola(self):
-        self.bola = Ball(self.app, pos=(1, -0.8, 0.5))  # Adicione o  aqui
+        self.bola = Ball(self.app, pos=(1, -1.15, 0.5))  # Adicione o  aqui
         self.add_object(self.bola)  # Adicione a bola à lista de objetos
-        self.velocidade_bola = 0.05  # Ajuste a velocidade conforme necessário
-        self.pontos_bola_x = np.array([1, 7.525,10.2, 13.175,16.6, 20.625,25.4,31.075 ])
-        self.pontos_bola_y = np.array([-0.8, -0.8, -0.8, -0.8, -0.8, -0.8, -0.8, -0.8])
+        self.velocidade_bola = 0.0001  # Ajuste a velocidade conforme necessário
+        self.pontos_bola_x = np.array([1, 7.525,10.2, 13.175,16.6, 20.625,25.4,31.075])
+        self.pontos_bola_y = np.array([-1.15,-1.15,-1.15,-1.15,-1.15,-1.15,-1.15,-1.15])
         self.pontos_bola_z = np.array([0.5,6.9 ,11.1, 15.1,18.9, 22.5,25.9,29.1 ])
         self.t = np.linspace(self.pontos_bola_x[0], self.pontos_bola_x[-1], num=500)
         self.interp_bola_x = interp1d(self.pontos_bola_x, self.pontos_bola_x, kind='cubic')
@@ -27,12 +31,12 @@ class Scene:
         self.indice_interpolacao_bola = 0
 
     def load_interpolacao_gato(self):
-        self.gato = Cat(self.app, pos=(1, -1.5, 2), rot=(-90, 0, 0))  # Adicione o gato aqui
+        self.gato = Cat(self.app, pos=(1, -1.5, 4), rot=(-90, -180, 0))  # Adicione o gato aqui
         self.add_object(self.gato)  # Adicione o gato à lista de objetos
         self.velocidade_gato = 0.015  # Ajuste a velocidade conforme necessário
-        self.pontos_gato_x = np.array([10, 15, 20, 25])
+        self.pontos_gato_x = np.array([1, 15, 20, 25])
         self.pontos_gato_y = np.array([-1.5, -1.5, -1.5, -1.5])
-        self.pontos_gato_z = np.array([20, 25, 30, 35])
+        self.pontos_gato_z = np.array([4, 25, 30, 35])
         self.t_gato = np.linspace(self.pontos_gato_x[0], self.pontos_gato_x[-1], num=500)
         self.interp_gato_x = interp1d(self.pontos_gato_x, self.pontos_gato_x, kind='cubic')
         self.interp_gato_y = interp1d(self.pontos_gato_x, self.pontos_gato_y, kind='cubic')
@@ -40,34 +44,43 @@ class Scene:
         self.indice_interpolacao_gato = 0
 
     def animar_gato(self):
-        # Verifica se ainda há pontos para interpolar
-        if self.indice_interpolacao_gato < len(self.t_gato):
+        if not self.animation_paused:  
+            # Verifica se ainda há pontos para interpolar
+            if self.indice_interpolacao_gato < len(self.t_gato):
             # Interpola os pontos
-            x_interpolado_gato = self.interp_gato_x(self.t_gato[self.indice_interpolacao_gato])
-            y_interpolado_gato = self.interp_gato_y(self.t_gato[self.indice_interpolacao_gato])
-            z_interpolado_gato = self.interp_gato_z(self.t_gato[self.indice_interpolacao_gato])
+                x_interpolado_gato = self.interp_gato_x(self.t_gato[self.indice_interpolacao_gato])
+                y_interpolado_gato = self.interp_gato_y(self.t_gato[self.indice_interpolacao_gato])
+                z_interpolado_gato = self.interp_gato_z(self.t_gato[self.indice_interpolacao_gato])
 
             # Atualiza a posição do gato
-            self.gato.pos = glm.vec3(x_interpolado_gato, y_interpolado_gato, z_interpolado_gato)
-            self.gato.m_model = self.gato.get_model_matrix()
+                self.gato.pos = glm.vec3(x_interpolado_gato, y_interpolado_gato, z_interpolado_gato)
+                self.gato.m_model = self.gato.get_model_matrix()
 
             # Incrementa o índice de interpolação
-            self.indice_interpolacao_gato += 1
+                self.indice_interpolacao_gato += 1
 
     def animar_bola(self):
+        if not self.animation_paused:
         # Verifica se ainda há pontos para interpolar
-        if self.indice_interpolacao_bola < len(self.t):
+            if self.indice_interpolacao_bola < len(self.t):
             # Interpola os pontos
-            x_interpolado_bola = self.interp_bola_x(self.t[self.indice_interpolacao_bola])
-            y_interpolado_bola = self.interp_bola_y(self.t[self.indice_interpolacao_bola])
-            z_interpolado_bola = self.interp_bola_z(self.t[self.indice_interpolacao_bola])
+                x_interpolado_bola = self.interp_bola_x(self.t[self.indice_interpolacao_bola])
+                y_interpolado_bola = self.interp_bola_y(self.t[self.indice_interpolacao_bola])
+                z_interpolado_bola = self.interp_bola_z(self.t[self.indice_interpolacao_bola])
 
             # Atualiza a posição da bola
-            self.bola.pos = glm.vec3(x_interpolado_bola, y_interpolado_bola, z_interpolado_bola)
-            self.bola.m_model = self.bola.get_model_matrix()
+                self.bola.pos = glm.vec3(x_interpolado_bola, y_interpolado_bola, z_interpolado_bola)
+                self.bola.m_model = self.bola.get_model_matrix()
+                rect_bola = pg.Rect(int(x_interpolado_bola), int(y_interpolado_bola), 20, 100)
+                rect_gato = pg.Rect(self.gato.pos.x, self.gato.pos.y, 20, 100)
+
+            # Verifique a colisão entre os retângulos
+                if rect_bola.colliderect(rect_gato):
+                    print("Bola colidiu com o gato!")
+                    self.animation_paused = True
 
             # Incrementa o índice de interpolação
-            self.indice_interpolacao_bola += 1
+                self.indice_interpolacao_bola += 1
         
 
     def add_object(self, obj):
@@ -86,7 +99,6 @@ class Scene:
         meio_campo_x = campo_final_x / 2
         area_x = 10 # campo_final_x / 3
         area_z = 5 # campo_final_z / 9
-        penalti_x = 6 # campo_final_x / 5
         penalti_z = 9 # campo_final_z / 5
 
 # linhas do campo 
@@ -123,7 +135,6 @@ class Scene:
             for z in range(campo_final_z+1):
                 add(Cobe(app, pos=(x, -2, z)))
                 add(Cobe(app, pos=(x, -2, campo_final_z-z)))
-
 
        
 
