@@ -18,11 +18,11 @@ class Scene:
         self.animation_paused = not self.animation_paused
 
     def load_interpolacao_bola(self):
-        self.bola = Ball(self.app, pos=(1, -1.15, 0.5))  # Adicione o  aqui
+        self.bola = Ball(self.app, pos=(5, -1.15, 2.5))  # Adicione o  aqui
         self.add_object(self.bola)  # Adicione a bola à lista de objetos
-        self.pontos_bola_x = np.array([1, 7.525,10.2, 13.175,16.6, 20.625,25.4,31.075])
+        self.pontos_bola_x = np.array([5, 7.525,10.2, 13.175,16.6, 20.625,25.4,31.075])
         self.pontos_bola_y = np.array([-1.15,-1.15,-1.15,-1.15,-1.15,-1.15,-1.15,-1.15])
-        self.pontos_bola_z = np.array([0.5,6.9 ,11.1, 15.1,18.9, 22.5,25.9,29.1 ])
+        self.pontos_bola_z = np.array([2.5,6.9 ,11.1, 15.1,18.9, 22.5,25.9,29.1 ])
         self.t = np.linspace(self.pontos_bola_x[0], self.pontos_bola_x[-1], num=500)
         self.interp_bola_x = interp1d(self.pontos_bola_x, self.pontos_bola_x, kind='cubic')
         self.interp_bola_y = interp1d(self.pontos_bola_x, self.pontos_bola_y, kind='cubic')
@@ -30,11 +30,11 @@ class Scene:
         self.indice_interpolacao_bola = 0
 
     def load_interpolacao_gato(self):
-        self.gato = Cat(self.app, pos=(1, -1.5, 4), rot=(-90, -180, 0))  # Adicione o gato aqui
+        self.gato = Cat(self.app, pos=(5, -1.5, 7.5), rot=(-90, -180, 0))  # Adicione o gato aqui
         self.add_object(self.gato)  # Adicione o gato à lista de objetos
-        self.pontos_gato_x = np.array([1, 10, 26, 33.8])
+        self.pontos_gato_x = np.array([5,12,20.75,33])
         self.pontos_gato_y = np.array([-1.5, -1.5, -1.5, -1.5])
-        self.pontos_gato_z = np.array([5.5, 11, 22.5, 45.4])
+        self.pontos_gato_z = np.array([7.5 ,14.5, 23.25,35.5])
         self.t_gato = np.linspace(self.pontos_gato_x[0], self.pontos_gato_x[-1], num=500)
         self.interp_gato_x = interp1d(self.pontos_gato_x, self.pontos_gato_x, kind='cubic')
         self.interp_gato_y = interp1d(self.pontos_gato_x, self.pontos_gato_y, kind='cubic')
