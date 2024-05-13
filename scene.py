@@ -30,11 +30,13 @@ class Scene:
         self.indice_interpolacao_bola = 0
 
     def load_interpolacao_gato(self):
+        posicao_x = float(input("Adicione a posicao x: "))
+        posicao_z = float(input("Adicione a posicao z: "))
         self.gato = Cat(self.app, pos=(5, -1.5, 7.5), rot=(-90, -180, 0))  # Adicione o gato aqui
         self.add_object(self.gato)  # Adicione o gato à lista de objetos
-        self.pontos_gato_x = np.array([5,12,20.75,33])
+        self.pontos_gato_x = np.array([posicao_x*5,(posicao_x+(2.8*1**2/2))*5,(posicao_x+(2.8*1.5**2/2))*5,(posicao_x+(2.8*2**2/2))*5])
         self.pontos_gato_y = np.array([-1.5, -1.5, -1.5, -1.5])
-        self.pontos_gato_z = np.array([7.5 ,14.5, 23.25,35.5])
+        self.pontos_gato_z = np.array([posicao_z*5 ,(posicao_z+(2.8*1**2/2))*5,(posicao_z+(2.8*1.5**2/2))*5,(posicao_z+(2.8*2**2/2))*5])
         self.t_gato = np.linspace(self.pontos_gato_x[0], self.pontos_gato_x[-1], num=500)
         self.interp_gato_x = interp1d(self.pontos_gato_x, self.pontos_gato_x, kind='cubic')
         self.interp_gato_y = interp1d(self.pontos_gato_x, self.pontos_gato_y, kind='cubic')

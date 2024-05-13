@@ -10,4 +10,4 @@ Para instalar as bibliotecas use esse comando no powershell
 pip install pywavefront PyGLM numpy pygame moderngl scipy
 
 Para rodar o programa use esse comando
-pyhton main.py
+python main.py
