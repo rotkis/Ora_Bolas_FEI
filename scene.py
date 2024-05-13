@@ -34,7 +34,7 @@ class Scene:
         self.add_object(self.gato)  # Adicione o gato à lista de objetos
         self.pontos_gato_x = np.array([1, 10, 26, 33.8])
         self.pontos_gato_y = np.array([-1.5, -1.5, -1.5, -1.5])
-        self.pontos_gato_z = np.array([4, 11, 22.5, 45.4])
+        self.pontos_gato_z = np.array([5.5, 11, 22.5, 45.4])
         self.t_gato = np.linspace(self.pontos_gato_x[0], self.pontos_gato_x[-1], num=500)
         self.interp_gato_x = interp1d(self.pontos_gato_x, self.pontos_gato_x, kind='cubic')
         self.interp_gato_y = interp1d(self.pontos_gato_x, self.pontos_gato_y, kind='cubic')
