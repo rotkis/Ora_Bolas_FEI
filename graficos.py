@@ -7,7 +7,7 @@ plt.title("Trajetória da Bola")
 plt.xlabel("X") 
 plt.ylabel("Y")
 plt.grid(True)
-plt.plot(x, y)
+plt.plot(x, y)  
 
 
 plt.show()

@@ -46,7 +46,7 @@ class Scene:
         rect_gato = pg.Rect(float(self.gato.pos.x), float(self.gato.pos.z), 1, 3)
 
         if rect_bola.colliderect(rect_gato):
-            print("Bola colidiu com o gato!")
+            print(f"Collision! Ball position: ({self.bola.pos.x}, {self.bola.pos.y}, {self.bola.pos.z}), Cat position: ({self.gato.pos.x}, {self.gato.pos.y}, {self.gato.pos.z})")
             self.animation_paused = True
     
     def animar(self):
