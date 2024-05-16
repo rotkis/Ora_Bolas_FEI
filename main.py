@@ -6,10 +6,22 @@ from camera import Camera
 from light import Light
 from mesh import Mesh
 from scene import Scene
+import matplotlib.pyplot as plt
+from multiprocessing import Process
 
+
+def matplotlib_plot():
+        x = np.linspace(-10, 10, 100)
+        y = x**2
+        plt.plot(x, y)
+        plt.title("Function y = x^2")
+        plt.show()
 
 class GraphicsEngine:
     def __init__(self, win_size=(1600, 900)):
+
+        # posicao_x = float(input("Adicione a posicao x: "))
+        # posicao_z = float(input("Adicione a posicao z: "))
         # init pygame modules
         pg.init()
         # window size
@@ -39,6 +51,7 @@ class GraphicsEngine:
         self.mesh = Mesh(self)
         # scene
         self.scene = Scene(self)
+        
 
     def check_events(self):
         for event in pg.event.get():
@@ -75,5 +88,13 @@ class GraphicsEngine:
 
 
 if __name__ == '__main__':
+    
+    
     app = GraphicsEngine()
-    app.run()
+    # matplot_process = Process(target=matplotlib_plot())
+    pygame_process = Process(target=app.run())
+    pygame_process.start()
+    # matplot_process.start()
+    pygame_process.join()
+    # matplot_process.join()
+

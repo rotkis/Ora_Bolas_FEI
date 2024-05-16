@@ -3,45 +3,23 @@ import glm
 import numpy as np
 from scipy.interpolate import interp1d
 import pygame as pg
+import math
 
 
 class Scene:
+    
     def __init__(self, app):
         self.app = app
         self.objects = []
         self.load()
-        self.load_interpolacao_bola()
-        self.load_interpolacao_gato()
-        self.animation_paused = True
         
-    def toggle_animation(self):
-        self.animation_paused = not self.animation_paused
-
-    def load_interpolacao_bola(self):
-        self.bola = Ball(self.app, pos=(5, -1.15, 2.5))  # Adicione o  aqui
-        self.add_object(self.bola)  # Adicione a bola à lista de objetos
-        self.pontos_bola_x = np.array([5, 7.525,10.2, 13.175,16.6, 20.625,25.4,31.075])
-        self.pontos_bola_y = np.array([-1.15,-1.15,-1.15,-1.15,-1.15,-1.15,-1.15,-1.15])
-        self.pontos_bola_z = np.array([2.5,6.9 ,11.1, 15.1,18.9, 22.5,25.9,29.1 ])
-        self.t = np.linspace(self.pontos_bola_x[0], self.pontos_bola_x[-1], num=500)
-        self.interp_bola_x = interp1d(self.pontos_bola_x, self.pontos_bola_x, kind='cubic')
-        self.interp_bola_y = interp1d(self.pontos_bola_x, self.pontos_bola_y, kind='cubic')
-        self.interp_bola_z = interp1d(self.pontos_bola_x, self.pontos_bola_z, kind='cubic')
-        self.indice_interpolacao_bola = 0
-
-    def load_interpolacao_gato(self):
-        posicao_x = float(input("Adicione a posicao x: "))
-        posicao_z = float(input("Adicione a posicao z: "))
-        self.gato = Cat(self.app, pos=(5, -1.5, 7.5), rot=(-90, -180, 0))  # Adicione o gato aqui
-        self.add_object(self.gato)  # Adicione o gato à lista de objetos
-        self.pontos_gato_x = np.array([posicao_x*5,(posicao_x+(2.8*1**2/2))*5,(posicao_x+(2.8*1.5**2/2))*5,(posicao_x+(2.8*2**2/2))*5])
-        self.pontos_gato_y = np.array([-1.5, -1.5, -1.5, -1.5])
-        self.pontos_gato_z = np.array([posicao_z*5 ,(posicao_z+(2.8*1**2/2))*5,(posicao_z+(2.8*1.5**2/2))*5,(posicao_z+(2.8*2**2/2))*5])
-        self.t_gato = np.linspace(self.pontos_gato_x[0], self.pontos_gato_x[-1], num=500)
-        self.interp_gato_x = interp1d(self.pontos_gato_x, self.pontos_gato_x, kind='cubic')
-        self.interp_gato_y = interp1d(self.pontos_gato_x, self.pontos_gato_y, kind='cubic')
-        self.interp_gato_z = interp1d(self.pontos_gato_x, self.pontos_gato_z, kind='cubic')
-        self.indice_interpolacao_gato = 0
+        self.posicao_x = float(input("Adicione a posicao x: "))
+        self.posicao_z = float(input("Adicione a posicao z: "))
+        self.gato = Cat(self.app, pos=( self.posicao_x*5, -1.5, self.posicao_z*5), rot=(-90, -180, 0))
+        self.ponto_origem_gato = glm.vec3( self.posicao_x*5, -1.5,  self.posicao_z*5)
+        self.load_interpolacao( self.posicao_x, self.posicao_z)
+        self.temp( self.posicao_x, self.posicao_z)
+        self.animation_paused = True
 
     def check_collision(self):
         rect_bola = pg.Rect(float(self.bola.pos.x), float(self.bola.pos.z), 1, 2)
@@ -50,32 +28,108 @@ class Scene:
         if rect_bola.colliderect(rect_gato):
             print(f"Collision! Ball position: ({self.bola.pos.x}, {self.bola.pos.y}, {self.bola.pos.z}), Cat position: ({self.gato.pos.x}, {self.gato.pos.y}, {self.gato.pos.z})")
             self.animation_paused = True
+        
+    def toggle_animation(self):
+        self.animation_paused = not self.animation_paused
     
+    def distance(self,x1, y1, x2, y2):
+        return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+
+    def temp(self,x_robo,y_robo):
+        velocidade_robo = 2.8  # m/s
+        acelercao_robo = 2.8  # m/s^2
+        raio_interceptacao = 0.0943  # 9.43 em m 
+        # lend o trajetoria da bola
+        with open('ball_trajectory.txt', 'r') as file:
+            linhas = file.read().splitlines()
+
+    #substituir "." por "."
+        for line in linhas[1:]:  
+            t, x_ball, y_ball, z_ball = map(lambda val: float(val.replace(',', '.')), line.split())
+    
+        # Calcular a distância entre o robo e um ponto da trajetoria da bola.
+            distance_to_ball = self.distance(x_robo, y_robo, x_ball, y_ball)
+    
+        # Calcular o tempo que o robo leva pra percorrer esse distância.
+            robot_time = math.sqrt((2 * distance_to_ball) / acelercao_robo)
+    
+            if robot_time <= t:
+                print(f"Robot intercepts the ball at t = {t} seconds, x = {x_ball} meters, y = {y_ball} meters.")
+                return t
+            else:
+            # Calculate the new position of the robot after t seconds
+                new_x_robo = x_robo + (t / 0.2) * velocidade_robo
+                new_y_robo = y_robo + (t / 0.2) * velocidade_robo
+        
+            # Calculate the distance between the new robot position and the ball's position at time t
+                new_distance_to_ball = self.distance(new_x_robo, new_y_robo, x_ball, y_ball)
+        
+                if new_distance_to_ball <= raio_interceptacao:
+                    print(f"Robot intercepts the ball at t = {t} seconds, x = {x_ball} meters, y = {y_ball} meters.")
+                    return t
+                
+
+
+    def load_interpolacao(self,posicao_x,posicao_z):
+        self.gato = Cat(self.app, pos=(posicao_x*5, -1.5, posicao_z*5), rot=(-90, -180, 0))
+        self.add_object(self.gato)
+        self.bola = Ball(self.app, pos=(5, -1.15, 2.5))  # Adicione o  aqui
+        self.add_object(self.bola)  # Adicione a bola à lista de objetos
+        with open('ball_trajectory.txt', 'r') as file:
+            linhas = file.read().splitlines()
+    #substituir "." por "."
+        x_ball_values = [float(line.split()[1].replace(',', '.')) *5 for line in linhas[1:]]
+        z_ball_values = [float(line.split()[2].replace(',', '.')) *5 for line in linhas[1:]]
+        y_ball_values = [float(line.split()[3].replace(',', '.')) for line in linhas[1:]]
+# Atualizar self.pontos_bola_x com os valores extraídos
+        self.pontos_bola_x = np.array(x_ball_values)
+        self.pontos_bola_z = np.array(z_ball_values)
+        self.pontos_bola_y = np.array(y_ball_values)
+        self.t = np.linspace(self.pontos_bola_x[0], self.pontos_bola_x[-1], num=500)
+        self.interp_bola_x = interp1d(self.pontos_bola_x, self.pontos_bola_x, kind='cubic')
+        self.interp_bola_y = interp1d(self.pontos_bola_x, self.pontos_bola_y, kind='cubic')
+        self.interp_bola_z = interp1d(self.pontos_bola_x, self.pontos_bola_z, kind='cubic')
+        self.indice_interpolacao_bola = 0
+
+
+
     def animar(self):
+        velocidade_robo = 0.07
         if not self.animation_paused:
         # Verifica se ainda há pontos para interpolar
-            if self.indice_interpolacao_bola < len(self.t) or self.indice_interpolacao_gato < len(self.t_gato):
+            if self.indice_interpolacao_bola < len(self.t):
+                fator_bola = 1.0  # Bola se move a metade da velocidade normal
+                t_bola_ajustado = self.t * fator_bola
+            
             # Interpola os pontos
-                x_interpolado_bola = self.interp_bola_x(self.t[self.indice_interpolacao_bola])
-                y_interpolado_bola = self.interp_bola_y(self.t[self.indice_interpolacao_bola])
-                z_interpolado_bola = self.interp_bola_z(self.t[self.indice_interpolacao_bola])
-
-                x_interpolado_gato = self.interp_gato_x(self.t_gato[self.indice_interpolacao_gato])
-                y_interpolado_gato = self.interp_gato_y(self.t_gato[self.indice_interpolacao_gato])
-                z_interpolado_gato = self.interp_gato_z(self.t_gato[self.indice_interpolacao_gato])
+                x_interpolado_bola = self.interp_bola_x(t_bola_ajustado)[self.indice_interpolacao_bola]
+                y_interpolado_bola = self.interp_bola_y(t_bola_ajustado)[self.indice_interpolacao_bola]
+                z_interpolado_bola = self.interp_bola_z(t_bola_ajustado)[self.indice_interpolacao_bola]
 
             # Atualiza a posição da bola
                 self.bola.pos = glm.vec3(x_interpolado_bola, y_interpolado_bola, z_interpolado_bola)
                 self.bola.m_model = self.bola.get_model_matrix()
-
-                self.gato.pos = glm.vec3(x_interpolado_gato, y_interpolado_gato, z_interpolado_gato)
-                self.gato.m_model = self.gato.get_model_matrix()
-
             # Incrementa o índice de interpolação
+                # direcao = glm.normalize(self.bola.pos - self.ponto_origem_gato)
+                with open('ball_trajectory.txt', 'r') as file:
+                    linhas = file.read().splitlines()
+
+    #substituir "." por "."
+                for line in linhas[1:]:  
+                    t, x_ball, y_ball, z_ball = map(lambda val: float(val.replace(',', '.')), line.split())
+                distance_to_ball = self.distance(self.posicao_x, self.posicao_z, x_ball, y_ball)
+    
+        # Calcular o tempo que o robo leva pra percorrer esse distância.
+                robot_time = math.sqrt((2 * distance_to_ball) / acelercao_robo)
+                distancia = self.distance(self.ponto_origem_gato,self.bola.pos)
+                if distancia > 0.1:  # 'epsilon' para evitar oscilação
+                    self.ponto_origem_gato += direcao * velocidade_robo
+                    self.gato.pos = glm.vec3(self.ponto_origem_gato.x, -1.5, self.ponto_origem_gato.z)
+                    self.gato.m_model = self.gato.get_model_matrix()
                 self.check_collision()
             # Incrementa o índice de interpolação
                 self.indice_interpolacao_bola += 1
-                self.indice_interpolacao_gato += 1
+                
         
 
     def add_object(self, obj):
