@@ -94,7 +94,8 @@ class Scene:
 
 
     def animar(self):
-        velocidade_robo = 0.07
+        velocidade_robo = 0.0901  # m/s
+        acelercao_robo = 2.8  # m/s^2
         if not self.animation_paused:
         # Verifica se ainda há pontos para interpolar
             if self.indice_interpolacao_bola < len(self.t):
@@ -109,21 +110,37 @@ class Scene:
             # Atualiza a posição da bola
                 self.bola.pos = glm.vec3(x_interpolado_bola, y_interpolado_bola, z_interpolado_bola)
                 self.bola.m_model = self.bola.get_model_matrix()
-            # Incrementa o índice de interpolação
-                # direcao = glm.normalize(self.bola.pos - self.ponto_origem_gato)
-                with open('ball_trajectory.txt', 'r') as file:
-                    linhas = file.read().splitlines()
+   
+                distance_to_ball = self.distance(self.posicao_x, self.posicao_z, self.bola.pos.x, self.bola.pos.z)
+                # Definir a velocidade de rotação (em graus por quadro)
+                velocidade_rotacao = 0.07
 
-    #substituir "." por "."
-                for line in linhas[1:]:  
-                    t, x_ball, y_ball, z_ball = map(lambda val: float(val.replace(',', '.')), line.split())
-                distance_to_ball = self.distance(self.posicao_x, self.posicao_z, x_ball, y_ball)
-    
+               
+                direcao = glm.normalize(self.bola.pos - self.ponto_origem_gato)
+
+                # Calcular o ângulo em graus
+                angulo_alvo = math.degrees(math.atan2(direcao.z, direcao.x))
+
+# Calcular a diferença entre o ângulo alvo e o ângulo atual
+                diferenca_angulo = angulo_alvo - self.gato.rot.y
+
+# Ajustar a diferença de ângulo para ficar entre -180 e 180
+                while diferenca_angulo < -180: diferenca_angulo += 360
+                while diferenca_angulo > 180: diferenca_angulo -= 360
+
+# Calcular o ângulo de rotação com base na velocidade de rotação
+                angulo_rotacao = velocidade_rotacao if diferenca_angulo > 0 else -velocidade_rotacao
+
+# Atualizar a rotação do gato
+
+# Atualizar a matriz de modelo
+                self.gato.m_model = self.gato.get_model_matrix()
         # Calcular o tempo que o robo leva pra percorrer esse distância.
                 robot_time = math.sqrt((2 * distance_to_ball) / acelercao_robo)
-                distancia = self.distance(self.ponto_origem_gato,self.bola.pos)
-                if distancia > 0.1:  # 'epsilon' para evitar oscilação
+                # distancia = self.distance(self.ponto_origem_gato,self.bola.pos)
+                if robot_time > 0.1:  # 'epsilon' para evitar oscilação
                     self.ponto_origem_gato += direcao * velocidade_robo
+                    self.gato.rot.y += angulo_rotacao
                     self.gato.pos = glm.vec3(self.ponto_origem_gato.x, -1.5, self.ponto_origem_gato.z)
                     self.gato.m_model = self.gato.get_model_matrix()
                 self.check_collision()
