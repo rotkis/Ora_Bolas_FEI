@@ -12,7 +12,6 @@ class Scene:
         self.app = app
         self.objects = []
         self.load()
-        
         self.posicao_x = float(input("Adicione a posicao x: "))
         self.posicao_z = float(input("Adicione a posicao z: "))
         self.gato = Cat(self.app, pos=( self.posicao_x*5, -1.5, self.posicao_z*5), rot=(-90, -180, 0))

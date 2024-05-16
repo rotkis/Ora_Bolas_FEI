@@ -10,13 +10,6 @@ import matplotlib.pyplot as plt
 from multiprocessing import Process
 
 
-def matplotlib_plot():
-        x = np.linspace(-10, 10, 100)
-        y = x**2
-        plt.plot(x, y)
-        plt.title("Function y = x^2")
-        plt.show()
-
 class GraphicsEngine:
     def __init__(self, win_size=(1600, 900)):
 
