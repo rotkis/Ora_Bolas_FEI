@@ -6,6 +6,7 @@ from camera import Camera
 from light import Light
 from mesh import Mesh
 from scene import Scene
+from graficos import Graphics
 import matplotlib.pyplot as plt
 from multiprocessing import Process
 
@@ -81,13 +82,7 @@ class GraphicsEngine:
 
 
 if __name__ == '__main__':
-    
-    
     app = GraphicsEngine()
-    # matplot_process = Process(target=matplotlib_plot())
-    pygame_process = Process(target=app.run())
-    pygame_process.start()
-    # matplot_process.start()
-    pygame_process.join()
-    # matplot_process.join()
+    app.run()
+    app1 = Graphics()
 

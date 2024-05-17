@@ -1,65 +1,103 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib as mpl
-import math # matematica
-from model import *
-
+import math
 
 class Graphics:
     def __init__(self):
+        self.posicao_x_robo = []
+        self.posicao_z_robo = []
+        self.posicao_x_bola = []
+        self.posicao_z_bola = []
+        self.trajetoria_robo = []
+        self.trajetoria_bola = []
+        self.velocidades_robo = []
+        self.velocidades_bola = []
+        self.aceleracao_robo = []
+        self.aceleracao_bola = []
+        self.distancias = []
         self.posicao_x = float(input("Adicione a posicao x: "))
         self.posicao_z = float(input("Adicione a posicao z: "))
+        self.tempo = []
+        self.temp(self.posicao_x, self.posicao_z)
+        self.calcula_velocidade(self.trajetoria_robo, self.trajetoria_bola)
+        self.run()
+
+
+    def run(self):
         self.coordenadas()
-    def distance(self,x1, y1, x2, y2):
+        self.componente_v()
+        self.componete_a()
+        self.distancia()
+
+    def distance(self, x1, y1, x2, y2):
         return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-    def temp(self,x_robo,y_robo):
+
+    def calcula_aceleracao(self, velocidades_robo, velocidades_bola):
+        for i in range(1, len(velocidades_robo)):
+            ax = (velocidades_robo[i][0] - velocidades_robo[i-1][0]) / 0.02
+            ay = (velocidades_robo[i][1] - velocidades_robo[i-1][1]) / 0.02
+            self.aceleracao_robo.append([ax, ay])
+
+        for i in range(1, len(velocidades_bola)):
+            ax = (velocidades_bola[i][0] - velocidades_bola[i-1][0]) / 0.02
+            ay = (velocidades_bola[i][1] - velocidades_bola[i-1][1]) / 0.02
+            self.aceleracao_bola.append([ax, ay])
+
+    def calcula_velocidade(self, trajetoria_robo, trajetoria_bola):
+        for i in range(1, len(trajetoria_robo)):
+            vx = (trajetoria_robo[i][0] - trajetoria_robo[i-1][0]) / 0.02
+            vy = (trajetoria_robo[i][1] - trajetoria_robo[i-1][1]) / 0.02
+            self.velocidades_robo.append([vx, vy])
+
+        for i in range(1, len(trajetoria_bola)):
+            vx = (trajetoria_bola[i][0] - trajetoria_bola[i-1][0]) / 0.02
+            vy = (trajetoria_bola[i][1] - trajetoria_bola[i-1][1]) / 0.02
+            self.velocidades_bola.append([vx, vy])
+
+        self.calcula_aceleracao(self.velocidades_robo, self.velocidades_bola)
+
+    def temp(self, x_robo, y_robo):
         velocidade_robo = 2.8  # m/s
-        acelercao_robo = 2.8  # m/s^2
-        raio_interceptacao = 0.0943  # 9.43 em m 
-        # lend o trajetoria da bola
+        raio_interceptacao = 0.0943  # 9.43 em mm
+        new_x_robo = x_robo
+        new_y_robo = y_robo
+        i = 0
+
+        # Lendo a trajetória da bola
         with open('ball_trajectory.txt', 'r') as file:
             linhas = file.read().splitlines()
 
-    #substituir "." por "."
-        for line in linhas[1:]:  
+        for line in linhas[1:]:
             t, x_ball, y_ball, z_ball = map(lambda val: float(val.replace(',', '.')), line.split())
-    
-        # Calcular a distância entre o robo e um ponto da trajetoria da bola.
-            distance_to_ball = self.distance(x_robo, y_robo, x_ball, y_ball)
-    
-        # Calcular o tempo que o robo leva pra percorrer esse distância.
-            robot_time = math.sqrt((2 * distance_to_ball) / acelercao_robo)
-    
-            if robot_time <= t:
-                print(f"Robot intercepts the ball at t = {t} seconds, x = {x_ball} meters, y = {y_ball} meters.")
-                return t
-            else:
-            # Calculate the new position of the robot after t seconds
-                new_x_robo = x_robo + (t / 0.2) * velocidade_robo
-                new_y_robo = y_robo + (t / 0.2) * velocidade_robo
-        
-            # Calculate the distance between the new robot position and the ball's position at time t
-                new_distance_to_ball = self.distance(new_x_robo, new_y_robo, x_ball, y_ball)
-        
-                if new_distance_to_ball <= raio_interceptacao:
-                    print(f"Robot intercepts the ball at t = {t} seconds, x = {x_ball} meters, y = {y_ball} meters.")
-                    return t
-        
+
+            direcao = [x_ball - new_x_robo, y_ball - new_y_robo]
+            norma = math.sqrt(direcao[0] ** 2 + direcao[1] ** 2)
+            direcao = [direcao[0] / norma, direcao[1] / norma]
+
+            new_x_robo += direcao[0] * velocidade_robo * 0.02
+            new_y_robo += direcao[1] * velocidade_robo * 0.02
+
+            self.trajetoria_robo.append([new_x_robo, new_y_robo])
+            self.trajetoria_bola.append([x_ball, y_ball])
+            self.tempo.append(i * 0.02)
+            self.posicao_x_robo.append(new_x_robo)
+            self.posicao_z_robo.append(new_y_robo)
+            self.posicao_x_bola.append(x_ball)
+            self.posicao_z_bola.append(y_ball)
+            self.distancias.append(self.distance(new_x_robo, new_y_robo, x_ball, y_ball))
+
+            if self.distance(new_x_robo, new_y_robo, x_ball, y_ball) <= raio_interceptacao:
+                print(f"O robô alcançou a bola no tempo {i * 0.02:.2f}s, na posição [{new_x_robo:.3f}, {new_y_robo:.3f}]")
+                break
+            i += 1
 
     def coordenadas(self):
-        tempo =self.temp(self.posicao_x,self.posicao_z)
-        # Dados hipotéticos (substitua pelos seus dados reais)
-        # Tempo de 0 a 5 segundos
-        posicao_x_bola = 10 * tempo  # Exemplo: posição x da bola (função linear)
-        posicao_y_bola = 5 * tempo**2  # Exemplo: posição y da bola (função quadrática)
-        posicao_x_robo = 8 * tempo  # Exemplo: posição x do robô (função linear)
-        posicao_y_robo = 3 * tempo**2  # Exemplo: posição y do robô (função quadrática)
-        # Crie o gráfico
-        plt.figure(figsize=(8, 6))
-        plt.plot(tempo, posicao_x_bola, label='Posição x da bola')
-        plt.plot(tempo, posicao_y_bola, label='Posição y da bola')
-        plt.plot(tempo, posicao_x_robo, label='Posição x do robô')
-        plt.plot(tempo, posicao_y_robo, label='Posição y do robô')
+        plt.figure(figsize=(10, 12))
+        plt.plot(self.tempo, self.posicao_x_bola, label='Posição x da bola')
+        plt.plot(self.tempo, self.posicao_z_bola, label='Posição y da bola')
+        plt.plot(self.tempo, self.posicao_x_robo, label='Posição x do robô')
+        plt.plot(self.tempo, self.posicao_z_robo, label='Posição y do robô')
         plt.xlabel('Tempo (s)')
         plt.ylabel('Posição')
         plt.title('Posição da bola e do robô em função do tempo')
@@ -67,6 +105,37 @@ class Graphics:
         plt.grid(True)
         plt.show()
 
+    def componente_v(self):
+        plt.figure(figsize=(10, 12))
+        plt.plot(self.tempo[1:], [vel[0] for vel in self.velocidades_robo], label='Robô vx')
+        plt.plot(self.tempo[1:], [vel[1] for vel in self.velocidades_robo], label='Robô vy')
+        plt.plot(self.tempo[1:], [vel[0] for vel in self.velocidades_bola], label='Bola vx')
+        plt.plot(self.tempo[1:], [vel[1] for vel in self.velocidades_bola], label='Bola vy')
+        plt.xlabel('Tempo (s)')
+        plt.ylabel('Velocidade')
+        plt.title('Componentes da velocidade da bola e do robô')
+        plt.legend()
+        plt.show()
+
+    def componete_a(self):
+        plt.figure(figsize=(10, 12))
+        plt.plot(self.tempo[2:], [acc[0] for acc in self.aceleracao_robo], label='Robô ax')
+        plt.plot(self.tempo[2:], [acc[1] for acc in self.aceleracao_robo], label='Robô ay')
+        plt.plot(self.tempo[2:], [acc[0] for acc in self.aceleracao_bola], label='Bola ax')
+        plt.plot(self.tempo[2:], [acc[1] for acc in self.aceleracao_bola], label='Bola ay')
+        plt.xlabel('Tempo (s)')
+        plt.ylabel('Aceleração')
+        plt.title('Componentes da aceleração da bola e do robô')
+        plt.legend()
+        plt.show()
+
+    def distancia(self):
+        plt.figure(figsize=(10, 12))
+        plt.plot(self.tempo, self.distancias, label='Distância')
+        plt.xlabel('Tempo (s)')
+        plt.ylabel('Distância')
+        plt.title('Distância entre a bola e o robô')
+        plt.legend()
+        plt.show()
+
 app = Graphics()
-
-

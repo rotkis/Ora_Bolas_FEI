@@ -17,7 +17,6 @@ class Scene:
         self.gato = Cat(self.app, pos=( self.posicao_x*5, -1.5, self.posicao_z*5), rot=(-90, -180, 0))
         self.ponto_origem_gato = glm.vec3( self.posicao_x*5, -1.5,  self.posicao_z*5)
         self.load_interpolacao( self.posicao_x, self.posicao_z)
-        self.temp( self.posicao_x, self.posicao_z)
         self.animation_paused = True
 
     def check_collision(self):
@@ -34,38 +33,7 @@ class Scene:
     def distance(self,x1, y1, x2, y2):
         return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
-    def temp(self,x_robo,y_robo):
-        velocidade_robo = 2.8  # m/s
-        acelercao_robo = 2.8  # m/s^2
-        raio_interceptacao = 0.0943  # 9.43 em m 
-        # lend o trajetoria da bola
-        with open('ball_trajectory.txt', 'r') as file:
-            linhas = file.read().splitlines()
 
-    #substituir "." por "."
-        for line in linhas[1:]:  
-            t, x_ball, y_ball, z_ball = map(lambda val: float(val.replace(',', '.')), line.split())
-    
-        # Calcular a distância entre o robo e um ponto da trajetoria da bola.
-            distance_to_ball = self.distance(x_robo, y_robo, x_ball, y_ball)
-    
-        # Calcular o tempo que o robo leva pra percorrer esse distância.
-            robot_time = math.sqrt((2 * distance_to_ball) / acelercao_robo)
-    
-            if robot_time <= t:
-                print(f"Robot intercepts the ball at t = {t} seconds, x = {x_ball} meters, y = {y_ball} meters.")
-                return t
-            else:
-            # Calculate the new position of the robot after t seconds
-                new_x_robo = x_robo + (t / 0.2) * velocidade_robo
-                new_y_robo = y_robo + (t / 0.2) * velocidade_robo
-        
-            # Calculate the distance between the new robot position and the ball's position at time t
-                new_distance_to_ball = self.distance(new_x_robo, new_y_robo, x_ball, y_ball)
-        
-                if new_distance_to_ball <= raio_interceptacao:
-                    print(f"Robot intercepts the ball at t = {t} seconds, x = {x_ball} meters, y = {y_ball} meters.")
-                    return t
                 
 
 
@@ -109,32 +77,26 @@ class Scene:
             # Atualiza a posição da bola
                 self.bola.pos = glm.vec3(x_interpolado_bola, y_interpolado_bola, z_interpolado_bola)
                 self.bola.m_model = self.bola.get_model_matrix()
-   
                 distance_to_ball = self.distance(self.posicao_x, self.posicao_z, self.bola.pos.x, self.bola.pos.z)
                 # Definir a velocidade de rotação (em graus por quadro)
                 velocidade_rotacao = 0.07
-
-               
                 direcao = glm.normalize(self.bola.pos - self.ponto_origem_gato)
 
                 # Calcular o ângulo em graus
                 angulo_alvo = math.degrees(math.atan2(direcao.z, direcao.x))
-
-# Calcular a diferença entre o ângulo alvo e o ângulo atual
+                # Calcular a diferença entre o ângulo alvo e o ângulo atual
                 diferenca_angulo = angulo_alvo - self.gato.rot.y
 
-# Ajustar a diferença de ângulo para ficar entre -180 e 180
+                # Ajustar a diferença de ângulo para ficar entre -180 e 180
                 while diferenca_angulo < -180: diferenca_angulo += 360
                 while diferenca_angulo > 180: diferenca_angulo -= 360
 
-# Calcular o ângulo de rotação com base na velocidade de rotação
+                # Calcular o ângulo de rotação com base na velocidade de rotação
                 angulo_rotacao = velocidade_rotacao if diferenca_angulo > 0 else -velocidade_rotacao
 
-# Atualizar a rotação do gato
-
-# Atualizar a matriz de modelo
+                # Atualizar a matriz de modelo
                 self.gato.m_model = self.gato.get_model_matrix()
-        # Calcular o tempo que o robo leva pra percorrer esse distância.
+                # Calcular o tempo que o robo leva pra percorrer esse distância.
                 robot_time = math.sqrt((2 * distance_to_ball) / acelercao_robo)
                 # distancia = self.distance(self.ponto_origem_gato,self.bola.pos)
                 if robot_time > 0.1:  # 'epsilon' para evitar oscilação
