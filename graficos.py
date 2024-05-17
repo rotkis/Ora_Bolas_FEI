@@ -115,6 +115,7 @@ class Graphics:
         plt.ylabel('Velocidade')
         plt.title('Componentes da velocidade da bola e do robô')
         plt.legend()
+        plt.grid(True)
         plt.show()
 
     def componete_a(self):
@@ -127,6 +128,7 @@ class Graphics:
         plt.ylabel('Aceleração')
         plt.title('Componentes da aceleração da bola e do robô')
         plt.legend()
+        plt.grid(True)
         plt.show()
 
     def distancia(self):
@@ -136,6 +138,7 @@ class Graphics:
         plt.ylabel('Distância')
         plt.title('Distância entre a bola e o robô')
         plt.legend()
+        plt.grid(True)
         plt.show()
 
 app = Graphics()
