@@ -37,6 +37,9 @@ class Graphics:
         for i in range(1, len(velocidades_robo)):
             ax = (velocidades_robo[i][0] - velocidades_robo[i-1][0]) / 0.02
             ay = (velocidades_robo[i][1] - velocidades_robo[i-1][1]) / 0.02
+            if ax > 2.8 and ay > 2.8:
+                ax = 2.8
+                ay= 2.8
             self.aceleracao_robo.append([ax, ay])
 
         for i in range(1, len(velocidades_bola)):
@@ -48,6 +51,9 @@ class Graphics:
         for i in range(1, len(trajetoria_robo)):
             vx = (trajetoria_robo[i][0] - trajetoria_robo[i-1][0]) / 0.02
             vy = (trajetoria_robo[i][1] - trajetoria_robo[i-1][1]) / 0.02
+            if vx > 2.8 and vy > 2.8:
+                vx = 2.8
+                vy= 2.8
             self.velocidades_robo.append([vx, vy])
 
         for i in range(1, len(trajetoria_bola)):
