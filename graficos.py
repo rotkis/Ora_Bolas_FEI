@@ -37,14 +37,16 @@ class Graphics:
         for i in range(1, len(velocidades_robo)):
             ax = (velocidades_robo[i][0] - velocidades_robo[i-1][0]) / 0.02
             ay = (velocidades_robo[i][1] - velocidades_robo[i-1][1]) / 0.02
-            if ax > 2.8 and ay > 2.8:
-                ax = 2.8
-                ay= 2.8
+            
+            ax = 2.8
+            ay= 2.8
             self.aceleracao_robo.append([ax, ay])
 
         for i in range(1, len(velocidades_bola)):
             ax = (velocidades_bola[i][0] - velocidades_bola[i-1][0]) / 0.02
             ay = (velocidades_bola[i][1] - velocidades_bola[i-1][1]) / 0.02
+            ax = 2.8
+            ay= 2.8
             self.aceleracao_bola.append([ax, ay])
 
     def calcula_velocidade(self, trajetoria_robo, trajetoria_bola):
