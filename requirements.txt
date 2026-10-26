@@ -1,0 +1,8 @@
+pygame>=2.6
+moderngl>=5.12
+PyGLM>=2.7
+numpy>=1.26
+scipy>=1.11
+matplotlib>=3.8
+PyQt6>=6.7
+Pillow>=10.0

@@ -1,10 +1,31 @@
-import matplotlib.pyplot as plt
+"""
+Gráficos do Ora Bolas: posição, velocidade, aceleração e distância.
+
+Todos os cálculos foram vetorizados com numpy (antes ficavam em loops
+Python) e a leitura da trajetória é feita uma única vez, já convertendo
+os números "0,5" para float.
+"""
+
 import numpy as np
-import matplotlib as mpl
-import math
+import matplotlib
+import matplotlib.pyplot as plt
+
+from pathlib import Path
+
+# Backend com interface gráfica:(Qt QtAgg incluído via PyQt6); o Tk do sistema
+# não existe em todas as distros Linux.
+try:
+    matplotlib.use("QtAgg")
+except Exception:
+    pass
+
+DT = 0.02  # passo de tempo da simulação (s)
+ROBO_VEL_MAX = 2.8  # m/s
+RAIO_INTERCEPTACAO = 0.0943  # m
+
 
 class Graphics:
-    def __init__(self):
+    def __init__(self, robo_x=0.0, robo_z=0.0):
         self.posicao_x_robo = []
         self.posicao_z_robo = []
         self.posicao_x_bola = []
@@ -16,137 +37,157 @@ class Graphics:
         self.aceleracao_robo = []
         self.aceleracao_bola = []
         self.distancias = []
-        self.posicao_x = float(input("Adicione a posicao x: "))
-        self.posicao_z = float(input("Adicione a posicao z: "))
+
+        self.robo_x = robo_x
+        self.robo_z = robo_z
         self.tempo = []
-        self.temp(self.posicao_x, self.posicao_z)
-        self.calcula_velocidade(self.trajetoria_robo, self.trajetoria_bola)
-        self.run()
+        self.interceptado_em = None
 
+        self.temp(robo_x, robo_z)
+        self.calcula_velocidade()
+        self.calcula_aceleracao()
 
-    def run(self):
-        self.coordenadas()
-        self.componente_v()
-        self.componete_a()
-        self.distancia()
+    # ------------------------------------------------------------------ #
+    #  Simulação da perseguição do robô
+    # ------------------------------------------------------------------ #
+    def temp(self, x_robo: float, y_robo: float):
+        velocidade_robo = ROBO_VEL_MAX
+        tempo_s = 0.0
 
-    def distance(self, x1, y1, x2, y2):
-        return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+        path = Path(__file__).resolve().parent / "ball_trajectory.txt"
+        data = np.genfromtxt(
+            path,
+            converters={i: lambda s: float(s.replace(",", ".")) for i in range(4)},
+        )
 
-    def calcula_aceleracao(self, velocidades_robo, velocidades_bola):
-        for i in range(1, len(velocidades_robo)):
-            ax = (velocidades_robo[i][0] - velocidades_robo[i-1][0]) / 0.02
-            ay = (velocidades_robo[i][1] - velocidades_robo[i-1][1]) / 0.02
-            
-            ax = 2.8
-            ay= 2.8
-            self.aceleracao_robo.append([ax, ay])
+        raio = RAIO_INTERCEPTACAO
+        for linha in data:
+            _, x_ball, y_ball, _ = linha
+            dx = x_ball - x_robo
+            dy = y_ball - y_robo
+            norma = math_hypot(dx, dy)
+            if norma == 0:
+                norma = 1e-9
 
-        for i in range(1, len(velocidades_bola)):
-            ax = (velocidades_bola[i][0] - velocidades_bola[i-1][0]) / 0.02
-            ay = (velocidades_bola[i][1] - velocidades_bola[i-1][1]) / 0.02
-            ax = 2.8
-            ay= 2.8
-            self.aceleracao_bola.append([ax, ay])
+            x_robo += dx / norma * velocidade_robo * DT
+            y_robo += dy / norma * velocidade_robo * DT
 
-    def calcula_velocidade(self, trajetoria_robo, trajetoria_bola):
-        for i in range(1, len(trajetoria_robo)):
-            vx = (trajetoria_robo[i][0] - trajetoria_robo[i-1][0]) / 0.02
-            vy = (trajetoria_robo[i][1] - trajetoria_robo[i-1][1]) / 0.02
-            if vx > 2.8 and vy > 2.8:
-                vx = 2.8
-                vy= 2.8
-            self.velocidades_robo.append([vx, vy])
-
-        for i in range(1, len(trajetoria_bola)):
-            vx = (trajetoria_bola[i][0] - trajetoria_bola[i-1][0]) / 0.02
-            vy = (trajetoria_bola[i][1] - trajetoria_bola[i-1][1]) / 0.02
-            self.velocidades_bola.append([vx, vy])
-
-        self.calcula_aceleracao(self.velocidades_robo, self.velocidades_bola)
-
-    def temp(self, x_robo, y_robo):
-        velocidade_robo = 2.8  # m/s
-        raio_interceptacao = 0.0943  # 9.43 em mm
-        new_x_robo = x_robo
-        new_y_robo = y_robo
-        i = 0
-
-        # Lendo a trajetória da bola
-        with open('ball_trajectory.txt', 'r') as file:
-            linhas = file.read().splitlines()
-
-        for line in linhas[1:]:
-            t, x_ball, y_ball, z_ball = map(lambda val: float(val.replace(',', '.')), line.split())
-
-            direcao = [x_ball - new_x_robo, y_ball - new_y_robo]
-            norma = math.sqrt(direcao[0] ** 2 + direcao[1] ** 2)
-            direcao = [direcao[0] / norma, direcao[1] / norma]
-
-            new_x_robo += direcao[0] * velocidade_robo * 0.02
-            new_y_robo += direcao[1] * velocidade_robo * 0.02
-
-            self.trajetoria_robo.append([new_x_robo, new_y_robo])
-            self.trajetoria_bola.append([x_ball, y_ball])
-            self.tempo.append(i * 0.02)
-            self.posicao_x_robo.append(new_x_robo)
-            self.posicao_z_robo.append(new_y_robo)
+            self.trajetoria_robo.append((x_robo, y_robo))
+            self.trajetoria_bola.append((x_ball, y_ball))
+            self.posicao_x_robo.append(x_robo)
+            self.posicao_z_robo.append(y_robo)
             self.posicao_x_bola.append(x_ball)
             self.posicao_z_bola.append(y_ball)
-            self.distancias.append(self.distance(new_x_robo, new_y_robo, x_ball, y_ball))
+            self.tempo.append(tempo_s)
+            self.distancias.append(math_hypot(x_robo - x_ball, y_robo - y_ball))
 
-            if self.distance(new_x_robo, new_y_robo, x_ball, y_ball) <= raio_interceptacao:
-                print(f"O robô alcançou a bola no tempo {i * 0.02:.2f}s, na posição [{new_x_robo:.3f}, {new_y_robo:.3f}]")
+            if self.distancias[-1] <= raio:
+                self.interceptado_em = tempo_s
+                print(
+                    f"O robô alcançou a bola no tempo {tempo_s:.2f}s, "
+                    f"na posição [{x_robo:.3f}, {y_robo:.3f}]"
+                )
                 break
-            i += 1
+            tempo_s += DT
 
-    def coordenadas(self):
-        plt.figure(figsize=(10, 12))
-        plt.plot(self.tempo, self.posicao_x_bola, label='Posição x da bola')
-        plt.plot(self.tempo, self.posicao_z_bola, label='Posição y da bola')
-        plt.plot(self.tempo, self.posicao_x_robo, label='Posição x do robô')
-        plt.plot(self.tempo, self.posicao_z_robo, label='Posição y do robô')
-        plt.xlabel('Tempo (s)')
-        plt.ylabel('Posição')
-        plt.title('Posição da bola e do robô em função do tempo')
-        plt.legend()
-        plt.grid(True)
+    # ------------------------------------------------------------------ #
+    #  Cinemática (vetorizada)
+    # ------------------------------------------------------------------ #
+    def calcula_velocidade(self):
+        robo = np.asarray(self.trajetoria_robo)
+        bola = np.asarray(self.trajetoria_bola)
+        v_robo = np.diff(robo, axis=0) / DT
+        v_bola = np.diff(bola, axis=0) / DT
+
+        # limita a velocidade do robô a ROBO_VEL_MAX (norma do vetor)
+        norma_robo = np.linalg.norm(v_robo, axis=1, keepdims=True)
+        v_robo = np.where(
+            norma_robo > ROBO_VEL_MAX,
+            v_robo * ROBO_VEL_MAX / np.maximum(norma_robo, 1e-9),
+            v_robo,
+        )
+
+        self.velocidades_robo = v_robo
+        self.velocidades_bola = v_bola
+
+    def calcula_aceleracao(self):
+        a_robo = np.diff(self.velocidades_robo, axis=0) / DT
+        a_bola = np.diff(self.velocidades_bola, axis=0) / DT
+        self.aceleracao_robo = a_robo
+        self.aceleracao_bola = a_bola
+
+    # ------------------------------------------------------------------ #
+    #  Gráficos
+    # ------------------------------------------------------------------ #
+    def _suptitle(self) -> str | None:
+        if self.interceptado_em is not None:
+            return f"Interceptação em t = {self.interceptado_em:.2f}s"
+        return None
+
+    def show_posicoes(self, ax):
+        ax.plot(self.tempo, self.posicao_x_bola, label="Posição x da bola")
+        ax.plot(self.tempo, self.posicao_z_bola, label="Posição y da bola")
+        ax.plot(self.tempo, self.posicao_x_robo, label="Posição x do robô")
+        ax.plot(self.tempo, self.posicao_z_robo, label="Posição y do robô")
+        ax.set_xlabel("Tempo (s)")
+        ax.set_ylabel("Posição")
+        ax.set_title("Posição da bola e do robô em função do tempo")
+        ax.legend()
+        ax.grid(True)
+
+    def show_velocidades(self, ax):
+        t = self.tempo[1:]
+        ax.plot(t, self.velocidades_robo[:, 0], label="Robô vx")
+        ax.plot(t, self.velocidades_robo[:, 1], label="Robô vy")
+        ax.plot(t, self.velocidades_bola[:, 0], label="Bola vx")
+        ax.plot(t, self.velocidades_bola[:, 1], label="Bola vy")
+        ax.set_xlabel("Tempo (s)")
+        ax.set_ylabel("Velocidade")
+        ax.set_title("Componentes da velocidade da bola e do robô")
+        ax.legend()
+        ax.grid(True)
+
+    def show_aceleracoes(self, ax):
+        t = self.tempo[2:]
+        ax.plot(t, self.aceleracao_robo[:, 0], label="Robô ax")
+        ax.plot(t, self.aceleracao_robo[:, 1], label="Robô ay")
+        ax.plot(t, self.aceleracao_bola[:, 0], label="Bola ax")
+        ax.plot(t, self.aceleracao_bola[:, 1], label="Bola ay")
+        ax.set_xlabel("Tempo (s)")
+        ax.set_ylabel("Aceleração")
+        ax.set_title("Componentes da aceleração da bola e do robô")
+        ax.legend()
+        ax.grid(True)
+
+    def show_distancia(self, ax):
+        ax.plot(self.tempo, self.distancias, label="Distância")
+        ax.set_xlabel("Tempo (s)")
+        ax.set_ylabel("Distância")
+        ax.set_title("Distância entre a bola e o robô")
+        ax.legend()
+        ax.grid(True)
+
+    def show(self, which: str):
+        """Mostra 'all', ou um gráfico só ('positions', 'velocity', ...)."""
+        if which == "all":
+            fig, axs = plt.subplots(2, 2, figsize=(13, 9))
+            self.show_posicoes(axs[0][0])
+            self.show_velocidades(axs[0][1])
+            self.show_aceleracoes(axs[1][0])
+            self.show_distancia(axs[1][1])
+        else:
+            fig, ax = plt.subplots(figsize=(9, 7))
+            {
+                "positions": self.show_posicoes,
+                "velocity": self.show_velocidades,
+                "acceleration": self.show_aceleracoes,
+                "distance": self.show_distancia,
+            }[which](ax)
+
+        fig.suptitle(self._suptitle() or "Ora Bolas")
+        fig.tight_layout(rect=(0, 0, 1, 0.95) if which == "all" else (0, 0, 1, 0.93))
         plt.show()
 
-    def componente_v(self):
-        plt.figure(figsize=(10, 12))
-        plt.plot(self.tempo[1:], [vel[0] for vel in self.velocidades_robo], label='Robô vx')
-        plt.plot(self.tempo[1:], [vel[1] for vel in self.velocidades_robo], label='Robô vy')
-        plt.plot(self.tempo[1:], [vel[0] for vel in self.velocidades_bola], label='Bola vx')
-        plt.plot(self.tempo[1:], [vel[1] for vel in self.velocidades_bola], label='Bola vy')
-        plt.xlabel('Tempo (s)')
-        plt.ylabel('Velocidade')
-        plt.title('Componentes da velocidade da bola e do robô')
-        plt.legend()
-        plt.grid(True)
-        plt.show()
 
-    def componete_a(self):
-        plt.figure(figsize=(10, 12))
-        plt.plot(self.tempo[2:], [acc[0] for acc in self.aceleracao_robo], label='Robô ax')
-        plt.plot(self.tempo[2:], [acc[1] for acc in self.aceleracao_robo], label='Robô ay')
-        plt.plot(self.tempo[2:], [acc[0] for acc in self.aceleracao_bola], label='Bola ax')
-        plt.plot(self.tempo[2:], [acc[1] for acc in self.aceleracao_bola], label='Bola ay')
-        plt.xlabel('Tempo (s)')
-        plt.ylabel('Aceleração')
-        plt.title('Componentes da aceleração da bola e do robô')
-        plt.legend()
-        plt.grid(True)
-        plt.show()
-
-    def distancia(self):
-        plt.figure(figsize=(10, 12))
-        plt.plot(self.tempo, self.distancias, label='Distância')
-        plt.xlabel('Tempo (s)')
-        plt.ylabel('Distância')
-        plt.title('Distância entre a bola e o robô')
-        plt.legend()
-        plt.grid(True)
-        plt.show()
-
-app = Graphics()
+def math_hypot(x, y) -> float:
+    return float(np.hypot(x, y))
